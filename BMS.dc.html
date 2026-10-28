@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Coship BMS · 3PL</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#F4F5F7;color:#1D2127;font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:#1F5FBF}a:hover{color:#174A94}
+button,input{font-family:inherit}
+.card{background:#FFFFFF;border:1px solid #D6DAE0;border-radius:10px}
+.kpi{background:#FFFFFF;border:1px solid #D6DAE0;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.kl{font-size:12px;color:#5A6370;font-weight:600}
+.kv{font-size:26px;font-weight:700}
+.ks{font-size:12px;color:#5A6370}
+.nav{display:block;width:100%;text-align:left;border:0;background:transparent;padding:10px 12px;min-height:44px;border-radius:8px;font-size:14px;font-weight:600;color:#3D4550;cursor:pointer}
+.nav:hover{background:#ECEEF2}
+.nav.on{background:#1D2127;color:#FFFFFF}
+.chip{border:1px solid #CBD1D8;background:#FFFFFF;border-radius:999px;padding:6px 12px;min-height:36px;font-size:13px;font-weight:600;color:#3D4550;cursor:pointer}
+.chip.on{background:#1F5FBF;border-color:#1F5FBF;color:#FFFFFF}
+.btn{border:1px solid #CBD1D8;background:#FFFFFF;border-radius:8px;padding:8px 14px;min-height:40px;font-size:13px;font-weight:600;color:#1D2127;cursor:pointer}
+.btn.pri{background:#1F5FBF;border-color:#1F5FBF;color:#FFFFFF}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.inp{border:1px solid #CBD1D8;border-radius:6px;padding:6px 8px;min-height:32px;font-size:13px;width:100%;box-sizing:border-box;background:#FFFFFF}
+.row{display:grid;gap:10px;padding:9px 16px;border-top:1px solid #ECEEF2;font-size:13px;align-items:center}
+.hd{color:#5A6370;font-weight:600;font-size:12px;border-top:0;background:#FAFBFC}
+.rowbtn{width:100%;border:0;background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.rowbtn:hover{background:#F5F7FA}
+.sel{background:#EAF1FB}
+.neg{color:#B42318;font-weight:700}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.mut{color:#5A6370}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.g{background:#E5F3E9;color:#18663A}
+.o{background:#FFF0D9;color:#8A4A00}
+.r{background:#FDE8E7;color:#A3241A}
+.n{background:#ECEEF2;color:#3D4550}
+.b{background:#E5EEFB;color:#1D4C93}
+.lock{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#5A6370;border:1px dashed #AEB6C0;border-radius:6px;padding:1px 6px}
+.scroll{overflow-x:auto}
+.step{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#8A939E}
+.step.on{color:#1F5FBF}
+.step.done{color:#18663A}
+.dot{width:22px;height:22px;border-radius:999px;border:2px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column">
+
+<header style="background: #FFFFFF; border-bottom: 1px solid #D6DAE0">
+<div style="padding: 12px 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 10px">
+<strong style="font-size: 17px">Coship BMS</strong>
+<span class="badge n">3PL</span>
+<span class="badge o">Sample data</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<button type="button" class="btn" onClick="{{toggleSync}}" style="display: flex; align-items: center; gap: 8px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18663A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+Excel Sync · 10:42 · 3 files OK
+</button>
+<span class="lock">
+<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+Excel-origin data read-only until cutover
+</span>
+<span style="font-size: 13px; color: #3D4550">Jaylen · Coship</span>
+</div>
+</div>
+<sc-if value="{{showSync}}" hint-placeholder-val="{{ false }}">
+<div style="border-top: 1px solid #ECEEF2; padding: 12px 20px; background: #FAFBFC">
+<div style="font-size: 13px; font-weight: 700; margin-bottom: 6px">Sync log</div>
+<div class="scroll"><div style="min-width: 720px">
+<div class="row hd" style="grid-template-columns: 110px 1.4fr 90px 90px 1.6fr"><span>Time</span><span>File</span><span>Added</span><span>Changed</span><span>Result</span></div>
+<sc-for list="{{syncLog}}" as="s" hint-placeholder-count="5">
+<div class="row" style="grid-template-columns: 110px 1.4fr 90px 90px 1.6fr"><span>{{s.time}}</span><span>{{s.file}}</span><span>{{s.add}}</span><span>{{s.chg}}</span><span><span class="badge {{s.cls}}">{{s.res}}</span></span></div>
+</sc-for>
+</div></div>
+</div>
+</sc-if>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; flex: 1; align-items: stretch">
+<nav aria-label="Main menu" style="flex: 1 1 200px; max-width: 100%; box-sizing: border-box; padding: 16px 12px; background: #FFFFFF; border-right: 1px solid #D6DAE0; display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{navs}}" as="n" hint-placeholder-count="7">
+<button type="button" class="nav {{n.cls}}" onClick="{{n.go}}">{{n.label}}</button>
+</sc-for>
+</nav>
+
+<main style="flex: 999 1 640px; min-width: 0; padding: 22px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+
+<sc-if value="{{is.dash}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<h1 style="margin: 0; font-size: 20px">Dashboard <span class="mut" style="font-size: 13px; font-weight: 500">Wed, Oct 28</span></h1>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px">
+<button type="button" class="kpi rowbtn" onClick="{{goIO}}"><span class="kl">Pending orders</span><span class="kv">{{pendingCount}}</span><span class="ks">SHIP OUT DATE 미입력 PO</span></button>
+<button type="button" class="kpi rowbtn" onClick="{{goScan}}"><span class="kl">Floor work today · 확인 필요</span><span class="kv" style="color: #8A4A00">{{floorCheck}}</span><span class="ks">완료 {{floorDone}} · 스캔 대기 {{floorWait}}</span></button>
+<button type="button" class="kpi rowbtn" onClick="{{goInvNeg}}"><span class="kl">Negative stock</span><span class="kv" style="color: #A3241A">{{negCount}}</span><span class="ks">A 또는 B 재고 음수 품목</span></button>
+<button type="button" class="kpi rowbtn" onClick="{{goParcel}}"><span class="kl">Parcel · 누락</span><span class="kv" style="color: #A3241A">{{parcelMissing}}</span><span class="ks">운송사 인보이스에 없는 운송장</span></button>
+<button type="button" class="kpi rowbtn" onClick="{{goBill}}"><span class="kl">Oct invoices</span><span class="kv">{{billDone}} / {{billTotal}}</span><span class="ks">확정 완료 화주사</span></button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start">
+<section class="card" style="flex: 1 1 380px; min-width: 0">
+<div style="padding: 12px 16px; font-weight: 700; font-size: 14px">Today's floor work <span class="mut" style="font-weight: 500; font-size: 12px">현장 작업 파일 작업현황 · 오늘 작업 행 기준</span></div>
+<div class="row hd" style="grid-template-columns: 1.4fr 1fr 1fr 1fr"><span>Client</span><span>완료</span><span>스캔 대기</span><span>확인 필요</span></div>
+<sc-for list="{{floor}}" as="f" hint-placeholder-count="4">
+<div class="row" style="grid-template-columns: 1.4fr 1fr 1fr 1fr"><span>{{f.client}}</span><span>{{f.done}}</span><span>{{f.wait}}</span><span class="{{f.cls}}">{{f.check}}</span></div>
+</sc-for>
+</section>
+<section class="card" style="flex: 1 1 380px; min-width: 0">
+<div style="padding: 12px 16px; font-weight: 700; font-size: 14px">October invoice progress</div>
+<div class="row hd" style="grid-template-columns: 1.4fr 1fr 1fr"><span>Client</span><span>Status</span><span>Amount</span></div>
+<sc-for list="{{billList}}" as="c" hint-placeholder-count="4">
+<button type="button" class="row rowbtn" onClick="{{c.open}}" style="grid-template-columns: 1.4fr 1fr 1fr"><span>{{c.client}}</span><span><span class="badge {{c.cls}}">{{c.status}}</span></span><span>{{c.total}}</span></button>
+</sc-for>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.inv}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<h1 style="margin: 0; font-size: 20px">Inventory</h1>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<div class="kpi"><span class="kl">On hand · {{invScope}}</span><span class="kv">{{totA}} <span class="ks">A</span> · {{totB}} <span class="ks">B</span></span><span class="ks">재고 비관리(Non_) 품목 제외</span></div>
+<button type="button" class="kpi rowbtn {{negSel}}" onClick="{{toggleNeg}}"><span class="kl">Negative stock</span><span class="kv" style="color: #A3241A">{{negCount}}</span><span class="ks">클릭하면 음수 품목만</span></button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{invChips}}" as="c" hint-placeholder-count="7">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}} · {{c.qty}}</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start">
+<section class="card" style="flex: 999 1 520px; min-width: 0">
+<div style="padding: 12px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+<label for="invq" style="font-size: 13px; font-weight: 600">Search</label>
+<input id="invq" class="inp" type="text" value="{{invQ}}" onChange="{{onInvQ}}" placeholder="품목명 일부, 별칭, UPC 끝자리" style="flex: 1 1 240px; width: auto; min-height: 40px">
+<span class="ks">{{invCount}} items</span>
+</div>
+<div class="scroll"><div style="min-width: 600px">
+<div class="row hd" style="grid-template-columns: 90px 2fr 1.3fr 70px 60px"><span>Client</span><span>Item</span><span>UPC</span><span>A</span><span>B</span></div>
+<sc-for list="{{invRows}}" as="r" hint-placeholder-count="8">
+<button type="button" class="row rowbtn {{r.selCls}}" onClick="{{r.pick}}" style="grid-template-columns: 90px 2fr 1.3fr 70px 60px">
+<span>{{r.client}}</span><span>{{r.name}}</span><span class="mono">{{r.upc}}</span><span class="{{r.aCls}}">{{r.a}}</span><span class="{{r.bCls}}">{{r.b}}</span>
+</button>
+</sc-for>
+</div></div>
+</section>
+<aside class="card" style="flex: 1 1 340px; min-width: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<sc-if value="{{hasItem}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div><div class="ks">{{it.client}}</div><strong style="font-size: 16px">{{it.name}}</strong></div>
+<div style="display: grid; grid-template-columns: 96px 1fr; gap: 6px 10px; font-size: 13px">
+<span class="mut">UPC</span><span class="mono">{{it.upcs}}</span>
+<span class="mut">Alias</span><span>{{it.alias}}</span>
+<span class="mut">Pack type</span><span>{{it.pack}}</span>
+<span class="mut">ItemCode</span><span class="mono">{{it.code}}</span>
+<span class="mut">On hand</span><span>A {{it.a}} · B {{it.b}}</span>
+</div>
+<div style="font-size: 13px; font-weight: 700">History <span class="ks" style="font-weight: 500">누적은 A 기준, NI는 누적 제외</span></div>
+<div>
+<div class="row hd" style="grid-template-columns: 54px 1fr 50px 54px; padding: 6px 0"><span>Date</span><span>Type · Ref</span><span>Qty</span><span>Bal.</span></div>
+<sc-for list="{{it.moves}}" as="m" hint-placeholder-count="5">
+<div class="row" style="grid-template-columns: 54px 1fr 50px 54px; padding: 6px 0; font-size: 12px"><span class="mut">{{m.date}}</span><span>{{m.kind}} · {{m.ref}}</span><span>{{m.qty}}</span><span style="font-weight: 600">{{m.bal}}</span></div>
+</sc-for>
+</div>
+<button type="button" class="btn" onClick="{{it.openHist}}">View full history →</button>
+</div>
+</sc-if>
+<sc-if value="{{noItem}}" hint-placeholder-val="{{ false }}">
+<p class="mut" style="font-size: 13px; text-align: center; margin: 24px 0">품목을 선택하면 UPC, 별칭, ItemCode, 이력이 표시됩니다</p>
+</sc-if>
+</aside>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.io}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 20px">Inbound / Outbound</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between">
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{ioTabs}}" as="t" hint-placeholder-count="3">
+<button type="button" class="chip {{t.cls}}" onClick="{{t.go}}">{{t.label}}</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{ioChips}}" as="c" hint-placeholder-count="5">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}}</button>
+</sc-for>
+</div>
+</div>
+<div class="card" style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<label class="ks" for="iof">From</label><input id="iof" class="inp" type="date" value="{{ioFrom}}" onChange="{{onIoFrom}}" style="width: 150px">
+<label class="ks" for="iot">To</label><input id="iot" class="inp" type="date" value="{{ioTo}}" onChange="{{onIoTo}}" style="width: 150px">
+<input class="inp" type="text" value="{{ioQ}}" onChange="{{onIoQ}}" placeholder="PO, 품목명, UPC, 고객명" aria-label="Search orders" style="flex: 1 1 220px; width: auto">
+<button type="button" class="btn">Export Excel</button>
+</div>
+<sc-if value="{{io.out}}" hint-placeholder-val="{{ true }}">
+<section class="card scroll"><div style="min-width: 1120px">
+<div class="row hd" style="grid-template-columns: 70px 70px 100px 84px 1.2fr 1.6fr 44px 40px 60px 1.3fr 70px 80px"><span>PO date</span><span>Ship out</span><span>PO</span><span>Client</span><span>Customer</span><span>Item</span><span>Qty</span><span>Type</span><span>Carrier</span><span>Tracking</span><span>Fee</span><span>Status</span></div>
+<sc-for list="{{outRows}}" as="r" hint-placeholder-count="6">
+<div class="row" style="grid-template-columns: 70px 70px 100px 84px 1.2fr 1.6fr 44px 40px 60px 1.3fr 70px 80px"><span>{{r.poDate}}</span><span>{{r.shipL}}</span><span>{{r.po}}</span><span>{{r.client}}</span><span>{{r.customer}}</span><span>{{r.item}}<br><span class="mono mut">{{r.upc}}</span></span><span>{{r.qty}}</span><span>{{r.type}}</span><span>{{r.carrier}}</span><span><sc-if value="{{r.hasTrk}}" hint-placeholder-val="{{ true }}"><a class="mono" href="{{r.trkUrl}}">{{r.tracking}}</a></sc-if><sc-if value="{{r.noTrk}}" hint-placeholder-val="{{ false }}"><span class="mut">-</span></sc-if></span><span>{{r.fee}}</span><span><span class="badge {{r.cls}}">{{r.status}}</span></span></div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">SHIP OUT DATE가 있는 행만 재고 차감 · 없으면 Pending. Thinkware 전용 열(Store, Company2, City, State)은 Thinkware 필터 시 표시</p>
+</sc-if>
+<sc-if value="{{io.in}}" hint-placeholder-val="{{ false }}">
+<section class="card scroll"><div style="min-width: 900px">
+<div class="row hd" style="grid-template-columns: 70px 100px 84px 1.8fr 1.2fr 50px 40px 80px 1.4fr"><span>Date</span><span>PO</span><span>Client</span><span>Item</span><span>UPC</span><span>Qty</span><span>Type</span><span>Status</span><span>Remark</span></div>
+<sc-for list="{{inRows}}" as="r" hint-placeholder-count="5">
+<div class="row" style="grid-template-columns: 70px 100px 84px 1.8fr 1.2fr 50px 40px 80px 1.4fr"><span>{{r.date}}</span><span>{{r.po}}</span><span>{{r.client}}</span><span>{{r.item}}</span><span class="mono">{{r.upc}}</span><span>{{r.qty}}</span><span>{{r.type}}</span><span><span class="badge {{r.cls}}">{{r.status}}</span></span><span class="mut">{{r.remark}}</span></div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">Inbound = CIPL 기준 등록 · Start = 기초 재고 · Fix = 픽킹 중 발견한 차이 조정 (입고 기록은 수정하지 않음)</p>
+</sc-if>
+<sc-if value="{{io.re}}" hint-placeholder-val="{{ false }}">
+<section class="card scroll"><div style="min-width: 760px">
+<div class="row hd" style="grid-template-columns: 70px 84px 100px 1.8fr 70px 80px 1.4fr"><span>Date</span><span>Client</span><span>PO</span><span>Item</span><span>Return</span><span>Fee</span><span>Remark</span></div>
+<sc-for list="{{reRows}}" as="r" hint-placeholder-count="3">
+<div class="row" style="grid-template-columns: 70px 84px 100px 1.8fr 70px 80px 1.4fr"><span>{{r.date}}</span><span>{{r.client}}</span><span>{{r.po}}</span><span>{{r.item}}</span><span>{{r.ret}}</span><span>{{r.fee}}</span><span class="mut">{{r.remark}}</span></div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">ReLabel · 반품 작업은 재고에 영향 없음. Return 수량과 Fee만 인보이스에 반영</p>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{is.hist}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 20px">History <span class="mut" style="font-size: 13px; font-weight: 500">입출고 · 재고 변동 통합 이력</span></h1>
+<div class="card" style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<label class="ks" for="hf">From</label><input id="hf" class="inp" type="date" value="{{hFrom}}" onChange="{{onHFrom}}" style="width: 150px">
+<label class="ks" for="ht">To</label><input id="ht" class="inp" type="date" value="{{hTo}}" onChange="{{onHTo}}" style="width: 150px">
+<input class="inp" type="text" value="{{hQ}}" onChange="{{onHQ}}" placeholder="PO, 품목명, 별칭, UPC" aria-label="Search history" style="flex: 1 1 220px; width: auto">
+<button type="button" class="btn">Export Excel</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between">
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{hTypes}}" as="c" hint-placeholder-count="6">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}}</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{hClients}}" as="c" hint-placeholder-count="5">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}}</button>
+</sc-for>
+</div>
+</div>
+<section class="card scroll"><div style="min-width: 1000px">
+<div class="row hd" style="grid-template-columns: 64px 84px 96px 120px 1.8fr 1.2fr 64px 50px 80px"><span>Date</span><span>Client</span><span>Type</span><span>PO / Ref</span><span>Item</span><span>UPC</span><span>Qty</span><span>Stock</span><span>Balance</span></div>
+<sc-for list="{{hRows}}" as="r" hint-placeholder-count="10">
+<div class="row" style="grid-template-columns: 64px 84px 96px 120px 1.8fr 1.2fr 64px 50px 80px"><span>{{r.date}}</span><span>{{r.client}}</span><span><span class="badge {{r.cls}}">{{r.type}}</span></span><span>{{r.po}}</span><span>{{r.item}}</span><span class="mono">{{r.upc}}</span><span>{{r.qty}}</span><span>{{r.st}}</span><span style="font-weight: 600">{{r.bal}}</span></div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">Balance = 해당 품목 · 재고 구분(A/B)의 변동 후 수량 · NI와 ReLabel은 재고 미반영 · 출고는 SHIP OUT DATE 기준 (대기 주문 제외)</p>
+</div>
+</sc-if>
+
+<sc-if value="{{is.scan}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 20px">Scan &amp; Serial</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<label for="sq" style="font-size: 13px; font-weight: 600">Search</label>
+<input id="sq" class="inp" type="text" value="{{scanQ}}" onChange="{{onScanQ}}" placeholder="Serial, PO, 품목명 (반품 · 보증 조회)" style="flex: 1 1 280px; width: auto; min-height: 40px">
+<label class="ks" for="sf">Ship out from</label><input id="sf" class="inp" type="date" value="{{sFrom}}" onChange="{{onSFrom}}" style="width: 150px">
+<label class="ks" for="st">To</label><input id="st" class="inp" type="date" value="{{sTo}}" onChange="{{onSTo}}" style="width: 150px">
+<button type="button" class="btn">Export Excel</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between">
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{sViews}}" as="c" hint-placeholder-count="2">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}}</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{scanChips}}" as="c" hint-placeholder-count="2">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}}</button>
+</sc-for>
+</div>
+</div>
+<sc-if value="{{sv.items}}" hint-placeholder-val="{{ false }}">
+<section class="card scroll"><div style="min-width: 800px">
+<div class="row hd" style="grid-template-columns: 1.6fr 90px 70px 3fr"><span>Item</span><span>Client</span><span>Serials</span><span>Serial list</span></div>
+<sc-for list="{{sItems}}" as="g" hint-placeholder-count="5">
+<div class="row" style="grid-template-columns: 1.6fr 90px 70px 3fr; align-items: start"><span>{{g.item}}<br><span class="mono mut">{{g.upc}}</span></span><span>{{g.client}}</span><span><strong>{{g.count}}</strong></span><span class="mono" style="word-break: break-all">{{g.list}}</span></div>
+</sc-for>
+</div></section>
+</sc-if>
+<sc-if value="{{sv.rows}}" hint-placeholder-val="{{ true }}">
+<section class="card scroll"><div style="min-width: 1000px">
+<div class="row hd" style="grid-template-columns: 64px 84px 100px 1.6fr 56px 1.1fr 1.3fr 130px 1.2fr"><span>Ship out</span><span>Client</span><span>PO</span><span>Item</span><span>Qty</span><span>UPC scanned</span><span>Serial</span><span>Status</span><span>Remark</span></div>
+<sc-for list="{{scanRows}}" as="r" hint-placeholder-count="8">
+<div class="row" style="grid-template-columns: 64px 84px 100px 1.6fr 56px 1.1fr 1.3fr 130px 1.2fr"><span>{{r.date}}</span><span>{{r.client}}</span><span>{{r.po}}</span><span>{{r.item}}</span><span>{{r.fq}}</span><span class="mono">{{r.upc}}</span><span class="mono">{{r.serial}}</span><span><span class="badge {{r.cls}}">{{r.status}}</span></span><span class="mut">{{r.remark}}</span></div>
+</sc-for>
+</div></section>
+</sc-if>
+<p class="ks" style="margin: 0">현장 작업 파일 Sync 결과 (조회 전용). 판정 순서: 스캔 대기 → 바코드 미등록 → 품목 불일치 → Serial 중복(최근 2개월) → Serial 확인요망 → O. 시리얼 스캔 화주사: Thinkware, Dogtra, Ecosense</p>
+</div>
+</sc-if>
+
+<sc-if value="{{is.ret}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 20px">Returns <span class="mut" style="font-size: 13px; font-weight: 500">리턴 파일 Sync · 조회 전용</span></h1>
+<div class="card" style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<label class="ks" for="rf">From</label><input id="rf" class="inp" type="date" value="{{rFrom}}" onChange="{{onRFrom}}" style="width: 150px">
+<label class="ks" for="rt">To</label><input id="rt" class="inp" type="date" value="{{rTo}}" onChange="{{onRTo}}" style="width: 150px">
+<input class="inp" type="text" value="{{rItem}}" onChange="{{onRItem}}" placeholder="품목명 · 별칭 · UPC" aria-label="Item" style="flex: 1 1 180px; width: auto">
+<input class="inp" type="text" value="{{rSerial}}" onChange="{{onRSerial}}" placeholder="Serial" aria-label="Serial" style="flex: 1 1 180px; width: auto">
+<button type="button" class="btn">Export Excel</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{rChips}}" as="c" hint-placeholder-count="5">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}}</button>
+</sc-for>
+</div>
+<section class="card scroll"><div style="min-width: 1080px">
+<div class="row hd" style="grid-template-columns: 64px 84px 110px 1.6fr 1.5fr 1.4fr 120px 1.2fr"><span>Received</span><span>Client</span><span>RMA / Ref</span><span>Item</span><span>Serial</span><span>Return tracking</span><span>Result</span><span>Remark</span></div>
+<sc-for list="{{rRows}}" as="r" hint-placeholder-count="5">
+<div class="row" style="grid-template-columns: 64px 84px 110px 1.6fr 1.5fr 1.4fr 120px 1.2fr"><span>{{r.date}}</span><span>{{r.client}}</span><span>{{r.ref}}</span><span>{{r.item}}<br><span class="mono mut">{{r.upc}}</span></span><span class="mono">{{r.serial}}</span>
+<span><sc-if value="{{r.hasTrk}}" hint-placeholder-val="{{ true }}"><a class="mono" href="{{r.trkUrl}}">{{r.tracking}}</a></sc-if><sc-if value="{{r.noTrk}}" hint-placeholder-val="{{ false }}"><span class="mut">-</span></sc-if></span>
+<span><span class="badge {{r.cls}}">{{r.result}}</span></span><span class="mut">{{r.remark}}</span></div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">리턴 파일(별도 제공)과 Sync · 검색: 날짜 범위, 품목, 시리얼 · 재입고는 Inbound에 별도 건으로 입력 (두 기록 연결은 추후) · Remark는 내부 전용 (포털 비표시)</p>
+</div>
+</sc-if>
+
+<sc-if value="{{is.parcel}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 20px">Parcel Billing <span class="mut" style="font-size: 13px; font-weight: 500">3PL팀 · 택배팀 공용</span></h1>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<div class="kpi"><span class="kl">정산완료</span><span class="kv" style="color: #18663A">{{pc.done}}</span></div>
+<div class="kpi"><span class="kl">누락</span><span class="kv" style="color: #A3241A">{{pc.miss}}</span><span class="ks">인보이스 주기 지났는데 미청구</span></div>
+<div class="kpi"><span class="kl">정산대기</span><span class="kv">{{pc.wait}}</span><span class="ks">다음 인보이스 대기</span></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{pChips}}" as="c" hint-placeholder-count="4">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}}</button>
+</sc-for>
+</div>
+<section class="card scroll"><div style="min-width: 760px">
+<div class="row hd" style="grid-template-columns: 80px 70px 1.6fr 1.4fr 110px 90px 70px"><span>Pickup</span><span>Carrier</span><span>Tracking</span><span>Customer</span><span>PO</span><span>Status</span><span>Team</span></div>
+<sc-for list="{{pRows}}" as="r" hint-placeholder-count="8">
+<div class="row" style="grid-template-columns: 80px 70px 1.6fr 1.4fr 110px 90px 70px"><span>{{r.date}}</span><span>{{r.carrier}}</span><span class="mono">{{r.tracking}}</span><span>{{r.customer}}</span><span>{{r.po}}</span><span><span class="badge {{r.cls}}">{{r.status}}</span></span><span class="mut">{{r.team}}</span></div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">운송장별 정산 상태만 표시 · 운송사 청구액, 마진, ADJ(사후 청구)는 다음 단계</p>
+</div>
+</sc-if>
+
+<sc-if value="{{is.bill}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<h1 style="margin: 0; font-size: 20px">Monthly Invoice <span class="mut" style="font-size: 13px; font-weight: 500">October 2026</span></h1>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{billList}}" as="c" hint-placeholder-count="4">
+<button type="button" class="chip {{c.chipCls}}" onClick="{{c.open}}">{{c.client}} · {{c.status}}</button>
+</sc-for>
+</div>
+<section class="card">
+<div style="padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-bottom: 1px solid #ECEEF2">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<strong style="font-size: 16px">{{bill.no}}</strong>
+<span class="ks">Monthly HBL · AR lines = 인보이싱 파일(Excel)에서 그대로 가져옴</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+<sc-for list="{{bill.steps}}" as="s" hint-placeholder-count="3">
+<span class="step {{s.cls}}"><span class="dot">{{s.n}}</span>{{s.label}}</span>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{bill.actions}}" as="a" hint-placeholder-count="2">
+<button type="button" class="btn {{a.cls}}" onClick="{{a.run}}">{{a.label}}</button>
+</sc-for>
+</div>
+</div>
+<sc-if value="{{bill.empty}}" hint-placeholder-val="{{ false }}">
+<p class="mut" style="padding: 32px 16px; margin: 0; text-align: center; font-size: 13px">아직 가져오지 않았습니다. Import from Excel을 누르면 인보이싱 파일의 10월 라인(자동 · 수동 항목 전부)을 불러옵니다</p>
+</sc-if>
+<sc-if value="{{bill.hasLines}}" hint-placeholder-val="{{ true }}">
+<div class="scroll"><div style="min-width: 820px">
+<div class="row hd" style="grid-template-columns: 1.5fr 1.9fr 90px 90px 100px 70px"><span>Item</span><span>Basis</span><span>Qty</span><span>Rate</span><span>Amount</span><span>Source</span></div>
+<sc-for list="{{bill.lines}}" as="l" hint-placeholder-count="8">
+<div class="row" style="grid-template-columns: 1.5fr 1.9fr 90px 90px 100px 70px">
+<span>{{l.item}}<span class="mut">{{l.remark}}</span></span>
+<span class="mut">{{l.basis}}</span>
+<span>
+<sc-if value="{{l.editQty}}" hint-placeholder-val="{{ false }}"><input class="inp" type="text" value="{{l.qty}}" onChange="{{l.onQty}}" aria-label="Quantity"></sc-if>
+<sc-if value="{{l.showQty}}" hint-placeholder-val="{{ true }}">{{l.qty}}</sc-if>
+</span>
+<span>{{l.rateL}}</span>
+<span>
+<sc-if value="{{l.editAmt}}" hint-placeholder-val="{{ false }}"><input class="inp" type="text" value="{{l.amtIn}}" onChange="{{l.onAmt}}" aria-label="Amount"></sc-if>
+<sc-if value="{{l.showAmt}}" hint-placeholder-val="{{ true }}"><strong>{{l.amt}}</strong></sc-if>
+</span>
+<span><span class="badge {{l.cls}}">{{l.src}}</span></span>
+</div>
+</sc-for>
+<div class="row" style="grid-template-columns: 1fr 100px 70px; font-weight: 700; background: #FAFBFC"><span style="text-align: right">Total (CAD, before tax)</span><span>{{bill.total}}</span><span></span></div>
+</div></div>
+<div style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid #ECEEF2">
+<sc-if value="{{bill.canEdit}}" hint-placeholder-val="{{ true }}">
+<button type="button" class="btn" onClick="{{bill.addLine}}">+ Add manual line</button>
+</sc-if>
+<button type="button" class="btn">Download detail (Excel)</button>
+<span class="badge {{bill.arCls}}">{{bill.arNote}}</span>
+<span class="ks">전환 전: 자동 · 수동 항목 모두 엑셀에서 계산 · 입력 후 가져옴 (BMS 수정 불가) · 전환 후: 요율표 × Sync 데이터 자동 계산 + 수동 항목 BMS 입력</span>
+</div>
+</sc-if>
+</section>
+
+</div>
+</sc-if>
+
+<sc-if value="{{is.master}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 20px">Master Data</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{mTabs}}" as="t" hint-placeholder-count="4">
+<button type="button" class="chip {{t.cls}}" onClick="{{t.go}}">{{t.label}}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{m.clients}}" hint-placeholder-val="{{ true }}">
+<section class="card scroll"><div style="min-width: 900px">
+<div class="row hd" style="grid-template-columns: 1fr 90px 80px 1.4fr 1.8fr 90px"><span>Client</span><span>Prefix</span><span>UPC check</span><span>Order channel</span><span>Contact</span><span>Inventory</span></div>
+<sc-for list="{{clientsM}}" as="c" hint-placeholder-count="8">
+<div class="row" style="grid-template-columns: 1fr 90px 80px 1.4fr 1.8fr 90px"><span>{{c.name}}</span><span class="mono">{{c.prefix}}</span><span>{{c.upc}}</span><span class="mut">{{c.channel}}</span><input class="inp" type="text" placeholder="[담당자 · 이메일 · 전화]" aria-label="Contact"><span class="mut">{{c.managed}}</span></div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">Prefix는 한 번 정하면 변경 불가 · UPC check = 주문 입력 시 UPC를 띄워 패킹슬립과 대조</p>
+</sc-if>
+
+<sc-if value="{{m.items}}" hint-placeholder-val="{{ false }}">
+<section class="card scroll"><div style="min-width: 980px">
+<div class="row hd" style="grid-template-columns: 90px 1.8fr 1.3fr 1.2fr 100px 110px 90px"><span>Client</span><span>Item</span><span>UPC</span><span>Alias</span><span>ItemCode</span><span>Managed</span><span>Pack type</span></div>
+<sc-for list="{{itemsM}}" as="i" hint-placeholder-count="8">
+<div class="row" style="grid-template-columns: 90px 1.8fr 1.3fr 1.2fr 100px 110px 90px">
+<span>{{i.client}}</span><span>{{i.name}}</span><span class="mono">{{i.upc}}</span><span class="mut">{{i.alias}}</span><span class="mono">{{i.code}}</span>
+<span><span class="badge {{i.mCls}}">{{i.managedL}}</span></span>
+<span class="mut">{{i.pack}}</span>
+</div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">전체 Excel Sync 값, 조회 전용 · Managed = Company에 Non_ 접두어가 없으면 Yes · 재고 관리 여부 · Qty per carton 등 품목 상세 입력은 BMS 전환 후 · 이름이 바뀌어도 ItemCode 유지, 옛 이름은 Alias로 연결</p>
+</sc-if>
+
+<sc-if value="{{m.rates}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{rateChips}}" as="c" hint-placeholder-count="4">
+<button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.name}}</button>
+</sc-for>
+</div>
+<section class="card scroll"><div style="min-width: 760px">
+<div class="row hd" style="grid-template-columns: 1.6fr 120px 2.2fr"><span>Service</span><span>Rate (CAD)</span><span>Qty basis</span></div>
+<sc-for list="{{rateRows}}" as="r" hint-placeholder-count="8">
+<div class="row" style="grid-template-columns: 1.6fr 120px 2.2fr">
+<span>{{r.item}}</span><span><strong>{{r.shown}}</strong></span><span class="mut">{{r.basis}}</span>
+</div>
+</sc-for>
+</div></section>
+<p class="ks" style="margin: 0">인보이싱 파일의 화주사별 rate를 읽어 표시 (조회 전용) · BMS 전환 후에는 여기서 직접 입력</p>
+</sc-if>
+
+<sc-if value="{{m.users}}" hint-placeholder-val="{{ false }}">
+<section class="card scroll"><div style="min-width: 760px">
+<div class="row hd" style="grid-template-columns: 1.2fr 1fr 2.4fr"><span>Role</span><span>Users</span><span>Access</span></div>
+<sc-for list="{{roles}}" as="r" hint-placeholder-count="4">
+<div class="row" style="grid-template-columns: 1.2fr 1fr 2.4fr"><span><strong>{{r.role}}</strong></span><span>{{r.users}}</span><span class="mut">{{r.access}}</span></div>
+</sc-for>
+</div></section>
+</sc-if>
+</div>
+</sc-if>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  S() {
+    const d = {
+      sec: 'dash', showSync: false,
+      invClient: 'All', invQ: '', neg: false, sel: 'DO_0002',
+      io: 'out', ioClient: 'All', ioFrom: '2026-10-01', ioTo: '2026-10-31', ioQ: '',
+      hFrom: '2026-10-01', hTo: '2026-10-31', hQ: '', hType: 'All', hClient: 'All',
+      scanQ: '', scanBad: false, sFrom: '2026-10-01', sTo: '2026-10-31', sView: 'rows',
+      rFrom: '2026-09-01', rTo: '2026-10-31', rItem: '', rSerial: '', rClient: 'All',
+      pStatus: 'All',
+      billClient: 'Dogtra',
+      inv: { VOVO: 'Draft', Thinkware: 'Confirmed', Dogtra: 'Review', Ecosense: 'None' },
+      qtyOv: {}, amtOv: {}, extra: { VOVO: [], Thinkware: [], Dogtra: [], Ecosense: [] },
+      pal: { VOVO: [22, 22, 21, 21, 20], Thinkware: [40, 40, 38, 38, 36], Dogtra: [14, 14, 13, 13, 12], Ecosense: [3, 3, 3, 2, 2] },
+      mt: 'clients', rateClient: 'VOVO', rateOv: {}, managedOv: {}, cartonOv: {}
+    };
+    return Object.assign(d, this.state || {});
+  }
+  renderVals() {
+    const s = this.S();
+    const set = (o) => this.setState(Object.assign(this.S(), o));
+    const n0 = (n) => Number(n).toLocaleString('en-US');
+    const money = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const num = (v) => { const x = parseFloat(String(v).replace(/[^0-9.\-]/g, '')); return isNaN(x) ? 0 : x; };
+    const iso = (md) => '2026-' + String(md).replace('/', '-');
+    const aliasOf = (name) => ((this._items || []).find((i) => i.name === name) || {}).alias || '';
+    const inR = (md, f, t) => { const d = iso(md); return (!f || d >= f) && (!t || d <= t); };
+    const hasQ = (q0, txt) => { const q1 = (q0 || '').trim().toLowerCase(); return !q1 || txt.toLowerCase().indexOf(q1) >= 0; };
+
+    const items = [
+      { client: 'VOVO', code: 'VO_0001', name: 'Bidet Seat VB-4000', upc: '880912344471', alias: 'VB4000', pack: 'TCB', a: 412, b: 0, carton: '' },
+      { client: 'VOVO', code: 'VO_0002', name: 'Bidet Seat VB-6000S', upc: '880912346017', alias: '-', pack: '외', a: 158, b: 0, carton: '' },
+      { client: 'VOVO', code: 'VO_0003', name: 'Stylement Upper Cover', upc: '880912348820', alias: '상부 커버', pack: 'TCB 상부', a: -3, b: 0, carton: '' },
+      { client: 'Thinkware', code: 'TH_0001', name: 'TW-U3000 Dash Cam 2CH 64GB', upc: '840035112305', alias: 'U3000 64G', pack: '-', a: 1240, b: 12, carton: '' },
+      { client: 'Thinkware', code: 'TH_0002', name: 'TW-Q200 Dash Cam 1CH', upc: '840035110769', alias: '-', pack: '-', a: 386, b: -1, carton: '' },
+      { client: 'Thinkware', code: 'TH_0003', name: 'TWA-SH Hardwiring Cable', upc: '840035119021', alias: 'Hardwire', pack: '-', a: 2210, b: 0, carton: '' },
+      { client: 'Dogtra', code: 'DO_0001', name: '280X Training Collar', upc: '813622021804', alias: '280X', pack: '-', a: 640, b: 0, carton: '' },
+      { client: 'Dogtra', code: 'DO_0002', name: 'Pathfinder 2 GPS Collar', upc: '813622024471', alias: 'PF2, Pathfinder2', pack: '-', a: 215, b: 0, carton: '' },
+      { client: 'Ecosense', code: 'EC_0001', name: 'EB100 Radon Monitor', upc: '860004981133', alias: 'EcoBlu', pack: '-', a: 360, b: 0, carton: '20' },
+      { client: 'Ecosense', code: 'EC_0002', name: 'RD200 Radon Detector', upc: '860004981140', alias: '-', pack: '-', a: -4, b: 0, carton: '16' },
+      { client: '3D', code: '3D_0001', name: '[3D item]', upc: '850019872210', alias: '-', pack: '-', a: 74, b: 0, carton: '' },
+      { client: 'Pages', code: 'PA_0001', name: '[Pages item]', upc: '850041230056', alias: '-', pack: '-', a: 530, b: 0, carton: '' }
+    ];
+    this._items = items;
+    const invClients = ['VOVO', 'Thinkware', 'Dogtra', 'Ecosense', '3D', 'Pages'];
+    const outAll = [
+      { poDate: '10/24', ship: '', po: 'DGB-24811', client: 'Dogtra', customer: 'Gun Dog Supply', item: 'Pathfinder 2 GPS Collar', upc: '813622024471', qty: 12, type: 'A', carrier: 'UPS', tracking: '-', fee: '-' },
+      { poDate: '10/27', ship: '', po: 'TW-FBA-1029', client: 'Thinkware', customer: 'Amazon FBA YVR2', item: 'TW-U3000 Dash Cam 2CH 64GB', upc: '840035112305', qty: 48, type: 'A', carrier: 'LTL', tracking: '-', fee: '-' },
+      { poDate: '10/27', ship: '', po: 'VO-10-118', client: 'VOVO', customer: 'Home Depot', item: 'Bidet Seat VB-4000', upc: '880912344471', qty: 6, type: 'A', carrier: 'UPS', tracking: '-', fee: '-' },
+      { poDate: '10/23', ship: '10/24', po: 'DGB-24790', client: 'Dogtra', customer: 'Lion Country Supply', item: '280X Training Collar', upc: '813622021804', qty: 20, type: 'A', carrier: 'UPS', tracking: '1Z84W1830312345678', fee: '$42.00' },
+      { poDate: '10/23', ship: '10/23', po: '#SS-55120', client: 'Thinkware', customer: 'J. Kim', item: 'TW-Q200 Dash Cam 1CH', upc: '840035110769', qty: 1, type: 'B', carrier: 'CP', tracking: '7023210038812345', fee: '$18.40' },
+      { poDate: '10/22', ship: '10/23', po: 'EC-3381', client: 'Ecosense', customer: 'Home Hardware', item: 'EB100 Radon Monitor', upc: '860004981133', qty: 45, type: 'A', carrier: 'UPS', tracking: '1Z84W1830398765432', fee: '$64.10' },
+      { poDate: '10/22', ship: '10/22', po: 'VO-10-109', client: 'VOVO', customer: 'Individual', item: 'Stylement Upper Cover', upc: '880912348820', qty: 2, type: 'A', carrier: 'CP', tracking: '7023210038890001', fee: '$22.75' }
+    ];
+    const inAll = [
+      { date: '10/27', po: 'TW-IN-3312', client: 'Thinkware', item: 'TW-U3000 Dash Cam 2CH 64GB', upc: '840035112305', qty: 500, type: 'A', status: 'Inbound', cls: 'b', remark: 'CIPL 기준' },
+      { date: '10/27', po: 'TW-IN-3312', client: 'Thinkware', item: 'TW-U3000 Dash Cam 2CH 64GB', upc: '840035112305', qty: -20, type: 'A', status: 'Fix', cls: 'o', remark: '픽킹 중 차이 (CIPL 500 / 실수량 480)' },
+      { date: '10/26', po: 'DG-IN-0915', client: 'Dogtra', item: 'Pathfinder 2 GPS Collar', upc: '813622024471', qty: 120, type: 'A', status: 'Inbound', cls: 'b', remark: '-' },
+      { date: '10/25', po: 'TW-RMA-118', client: 'Thinkware', item: 'TW-Q200 Dash Cam 1CH', upc: '840035110769', qty: 3, type: 'B', status: 'Inbound', cls: 'b', remark: '반품 B재고' },
+      { date: '10/24', po: 'TW-ACC-77', client: 'Thinkware', item: 'TWA-SH Hardwiring Cable', upc: '840035119021', qty: 300, type: 'NI', status: 'Inbound', cls: 'b', remark: '수량 비관리 소모품' },
+      { date: '10/01', po: 'OPEN', client: 'VOVO', item: 'Bidet Seat VB-6000S', upc: '880912346017', qty: 158, type: 'A', status: 'Start', cls: 'n', remark: '기초 재고' }
+    ];
+    const reAll = [
+      { date: '10/26', client: 'Thinkware', po: 'TW-RL-221', item: 'TW-U3000 Dash Cam 2CH 64GB', ret: 30, fee: '$15.00', remark: 'FBA 라벨 교체' },
+      { date: '10/21', client: 'Dogtra', po: 'DGB-RT-090', item: '280X Training Collar', ret: 2, fee: '$4.00', remark: '반품 검수' },
+      { date: '10/18', client: 'VOVO', po: 'VO-RT-031', item: 'Bidet Seat VB-4000', ret: 1, fee: '$3.00', remark: '반품 · 박스 파손' }
+    ];
+    const pendingCount = outAll.filter((r) => !r.ship).length;
+    const floor = [
+      { client: 'Thinkware', done: 42, wait: 6, check: 1 },
+      { client: 'Dogtra', done: 18, wait: 3, check: 2 },
+      { client: 'VOVO', done: 25, wait: 0, check: 0 },
+      { client: 'Ecosense', done: 9, wait: 2, check: 0 }
+    ].map((f) => Object.assign(f, { cls: f.check ? 'neg' : '' }));
+    const fsum = (k) => floor.reduce((t, f) => t + f[k], 0);
+    const negItems = items.filter((i) => i.a < 0 || i.b < 0);
+
+    // ---- Inventory
+    const q = (s.invQ || '').trim().toLowerCase();
+    const scoped = items.filter((i) => s.invClient === 'All' || i.client === s.invClient);
+    const invList = scoped.filter((i) => (!s.neg || i.a < 0 || i.b < 0) && (!q || i.name.toLowerCase().indexOf(q) >= 0 || i.alias.toLowerCase().indexOf(q) >= 0 || i.upc.indexOf(q) >= 0));
+    const sum = (arr, k) => arr.reduce((t, i) => t + i[k], 0);
+    const chip = (name, list) => ({ name: name === 'All' ? 'All clients' : name, qty: n0(sum(list, 'a') + sum(list, 'b')), cls: s.invClient === name ? 'on' : '', pick: () => set({ invClient: name, sel: null }) });
+    const invChips = [chip('All', items)].concat(invClients.map((c) => chip(c, items.filter((i) => i.client === c))));
+    const invRows = invList.map((i) => ({ client: i.client, name: i.name, upc: i.upc, a: n0(i.a), b: n0(i.b), aCls: i.a < 0 ? 'neg' : '', bCls: i.b < 0 ? 'neg' : '', selCls: s.sel === i.code ? 'sel' : '', pick: () => set({ sel: i.code }) }));
+    const sel = items.find((i) => i.code === s.sel);
+    let it = { moves: [] };
+    if (sel) {
+      const deltas = [
+        { date: '10/26', kind: 'Inbound', ref: 'IN-0915', d: 120 },
+        { date: '10/24', kind: 'Inbound (NI)', ref: 'ACC-77', d: 50, ni: true },
+        { date: '10/24', kind: 'Outbound', ref: 'PO-24790', d: -20 },
+        { date: '10/27', kind: 'Fix', ref: '픽킹 차이', d: -1 }
+      ];
+      const counted = deltas.filter((x) => !x.ni).reduce((t, x) => t + x.d, 0);
+      let bal = sel.a - counted;
+      const moves = [{ date: '10/01', kind: 'Start', ref: '기초 재고', qty: n0(bal), bal: n0(bal) }];
+      deltas.forEach((x) => {
+        if (!x.ni) bal += x.d;
+        moves.push({ date: x.date, kind: x.kind, ref: x.ref, qty: (x.d > 0 ? '+' : '') + x.d, bal: x.ni ? '(NI)' : n0(bal) });
+      });
+      it = { client: sel.client, name: sel.name, upcs: sel.upc, alias: sel.alias, pack: sel.client === 'VOVO' ? sel.pack : '-', code: sel.code, a: n0(sel.a), b: n0(sel.b), moves: moves,
+        openHist: () => set({ sec: 'hist', hQ: sel.name, hType: 'All', hClient: 'All' }) };
+    }
+
+    // ---- In/Out
+    const ioFilter = (r) => s.ioClient === 'All' || r.client === s.ioClient;
+    const ioChips = ['All', 'VOVO', 'Thinkware', 'Dogtra', 'Ecosense'].map((c) => ({ name: c === 'All' ? 'All clients' : c, cls: s.ioClient === c ? 'on' : '', pick: () => set({ ioClient: c }) }));
+    const ioTabs = [['out', 'Outbound'], ['in', 'Inbound'], ['re', 'ReLabel · Return']].map((t) => ({ label: t[1], cls: s.io === t[0] ? 'on' : '', go: () => set({ io: t[0] }) }));
+    const ioOk = (r, date, txt) => ioFilter(r) && inR(date, s.ioFrom, s.ioTo) && hasQ(s.ioQ, txt);
+    const outRows = outAll.filter((r) => ioOk(r, r.poDate, r.po + ' ' + r.item + ' ' + r.upc + ' ' + r.customer)).map((r) => Object.assign({}, r, { shipL: r.ship || '-', status: r.ship ? 'Shipped' : 'Pending', cls: r.ship ? 'g' : 'n',
+      hasTrk: !!r.tracking && r.tracking !== '-', noTrk: !r.tracking || r.tracking === '-',
+      trkUrl: r.carrier === 'UPS' ? 'https://www.ups.com/track?tracknum=' + r.tracking : 'https://www.canadapost-postescanada.ca/track-reperage/en#/details/' + r.tracking }));
+
+    // ---- Scan
+    const scanAll = [
+      { date: '10/28', client: 'Thinkware', po: 'TW-FBA-1029', item: 'TW-U3000 Dash Cam 2CH 64GB', fq: '48_1', upc: '840035112305', serial: 'U3K64B2210457', status: '[Dim] O', cls: 'o', remark: 'PO 첫 행 치수 없음' },
+      { date: '10/28', client: 'Thinkware', po: 'TW-FBA-1029', item: 'TW-U3000 Dash Cam 2CH 64GB', fq: '48_2', upc: '-', serial: '-', status: '[스캔 대기]', cls: 'n', remark: '' },
+      { date: '10/28', client: 'Dogtra', po: 'DGB-24811', item: 'Pathfinder 2 GPS Collar', fq: '12_3', upc: '813622021804', serial: '813622021804A10093311', status: '[품목 불일치]', cls: 'r', remark: 'UPC = 280X' },
+      { date: '10/27', client: 'Dogtra', po: 'DGB-24790', item: '280X Training Collar', fq: '20_7', upc: '813622021804', serial: '813622021804A10077120', status: '[Serial 중복]', cls: 'r', remark: '9/30 출고 DGB-23988과 중복' },
+      { date: '10/27', client: 'Ecosense', po: 'EC-3381', item: 'EB100 Radon Monitor', fq: '45_12', upc: '860004981133', serial: '2210', status: '[Serial 확인요망]', cls: 'o', remark: '' },
+      { date: '10/27', client: 'VOVO', po: 'VO-10-118', item: 'Bidet Seat VB-4000', fq: '6_1', upc: '880912340000', serial: '-', status: '[바코드 미등록]', cls: 'r', remark: '' },
+      { date: '10/24', client: 'Dogtra', po: 'DGB-24790', item: '280X Training Collar', fq: '20_1', upc: '813622021804', serial: '813622021804A10077101', status: 'O', cls: 'g', remark: '' },
+      { date: '10/23', client: 'Thinkware', po: '#SS-55120', item: 'TW-Q200 Dash Cam 1CH', fq: '1', upc: '840035110769', serial: 'Q200A1B2204871', status: 'O', cls: 'g', remark: '' }
+    ];
+    const sq = (s.scanQ || '').trim().toLowerCase();
+    const scanRows = scanAll.filter((r) => inR(r.date, s.sFrom, s.sTo) && (!s.scanBad || r.status !== 'O') && (!sq || (r.serial + ' ' + r.po + ' ' + r.item).toLowerCase().indexOf(sq) >= 0));
+    const groups = {};
+    scanRows.forEach((r) => {
+      if (!groups[r.item]) groups[r.item] = { item: r.item, client: r.client, upc: (items.find((i) => i.name === r.item) || {}).upc || '-', serials: [] };
+      if (r.serial && r.serial !== '-') groups[r.item].serials.push(r.serial);
+    });
+    const sItems = Object.keys(groups).map((k) => ({ item: groups[k].item, client: groups[k].client, upc: groups[k].upc, count: groups[k].serials.length, list: groups[k].serials.join(', ') || '-' }));
+    const sViews = [['rows', 'By row'], ['items', 'By item']].map((v) => ({ name: v[1], cls: s.sView === v[0] ? 'on' : '', pick: () => set({ sView: v[0] }) }));
+
+    // ---- Returns (return file sync)
+    const trkUrl = (c, t) => c === 'UPS' ? 'https://www.ups.com/track?tracknum=' + t : 'https://www.canadapost-postescanada.ca/track-reperage/en#/details/' + t;
+    const retAll = [
+      { date: '10/27', client: 'Dogtra', ref: 'RMA-DG-1182', item: '280X Training Collar', serial: '813622021804A10070555', carrier: 'UPS', tracking: '1Z84W1830355501111', result: 'Restock A', cls: 'g', remark: '개봉품, 정상 작동' },
+      { date: '10/25', client: 'Thinkware', ref: 'TW-RMA-118', item: 'TW-Q200 Dash Cam 1CH', serial: 'Q200A1B2201345', carrier: 'CP', tracking: '7023210038860021', result: 'B stock', cls: 'o', remark: '렌즈 스크래치' },
+      { date: '10/21', client: 'Dogtra', ref: 'DGB-RT-090', item: '280X Training Collar', serial: '813622021804A10061230', carrier: 'CP', tracking: '7023210038871234', result: 'B stock', cls: 'o', remark: '박스 훼손' },
+      { date: '10/18', client: 'VOVO', ref: 'VO-RT-031', item: 'Bidet Seat VB-4000', serial: '-', carrier: 'UPS', tracking: '', result: 'Disposal', cls: 'r', remark: '부품 누락' },
+      { date: '10/12', client: 'Thinkware', ref: 'TW-RMA-109', item: 'TW-U3000 Dash Cam 2CH 64GB', serial: 'U3K64B2207781', carrier: 'UPS', tracking: '1Z84W1830355477001', result: 'Return to client', cls: 'n', remark: '본사 입고 요청' },
+      { date: '09/30', client: 'Dogtra', ref: 'RMA-DG-1150', item: 'Pathfinder 2 GPS Collar', serial: '813622024471C30009870', carrier: 'UPS', tracking: '1Z84W1830355409876', result: 'Restock A', cls: 'g', remark: '-' }
+    ];
+    const rRows = retAll.filter((r) => inR(r.date, s.rFrom, s.rTo) && (s.rClient === 'All' || r.client === s.rClient)
+      && hasQ(s.rItem, r.item + ' ' + aliasOf(r.item) + ' ' + ((items.find((i) => i.name === r.item) || {}).upc || ''))
+      && hasQ(s.rSerial, r.serial))
+      .map((r) => Object.assign({}, r, { upc: (items.find((i) => i.name === r.item) || {}).upc || '-', hasTrk: !!r.tracking, noTrk: !r.tracking, trkUrl: trkUrl(r.carrier, r.tracking) }));
+    const rChips = ['All', 'VOVO', 'Thinkware', 'Dogtra', 'Ecosense'].map((c) => ({ name: c === 'All' ? 'All clients' : c, cls: s.rClient === c ? 'on' : '', pick: () => set({ rClient: c }) }));
+
+    // ---- History (ledger)
+    const led = [];
+    outAll.filter((r) => r.ship).forEach((r) => led.push({ date: r.ship, client: r.client, type: 'Outbound', po: r.po, item: r.item, upc: r.upc, d: -r.qty, st: r.type }));
+    inAll.forEach((r) => led.push({ date: r.date, client: r.client, type: r.status, po: r.po, item: r.item, upc: r.upc, d: r.qty, st: r.type }));
+    reAll.forEach((r) => led.push({ date: r.date, client: r.client, type: 'ReLabel', po: r.po, item: r.item, upc: (items.find((i) => i.name === r.item) || {}).upc || '-', d: r.ret, st: '-' }));
+    led.forEach((r, i) => { r.i = i; });
+    led.sort((x, y) => (iso(y.date) > iso(x.date) ? 1 : iso(y.date) < iso(x.date) ? -1 : y.i - x.i));
+    const balNow = {};
+    items.forEach((i) => { balNow[i.name + '|A'] = i.a; balNow[i.name + '|B'] = i.b; });
+    led.forEach((r) => {
+      if (r.type === 'ReLabel') { r.bal = '-'; return; }
+      if (r.st === 'NI') { r.bal = '(NI)'; return; }
+      const k = r.item + '|' + r.st;
+      if (balNow[k] === undefined) { r.bal = '-'; return; }
+      r.bal = n0(balNow[k]); balNow[k] -= r.d;
+    });
+    const tCls = { Inbound: 'b', Outbound: 'g', Fix: 'o', Start: 'n', ReLabel: 'n' };
+    const hRows = led.filter((r) => inR(r.date, s.hFrom, s.hTo) && (s.hType === 'All' || r.type === s.hType) && (s.hClient === 'All' || r.client === s.hClient) && hasQ(s.hQ, r.po + ' ' + r.item + ' ' + r.upc + ' ' + aliasOf(r.item)))
+      .map((r) => ({ date: r.date, client: r.client, type: r.type, cls: tCls[r.type] || 'n', po: r.po, item: r.item, upc: r.upc, qty: (r.d > 0 ? '+' : '') + n0(r.d), st: r.st, bal: r.bal }));
+    const hTypes = ['All', 'Inbound', 'Outbound', 'Fix', 'Start', 'ReLabel'].map((t) => ({ name: t === 'All' ? 'All types' : t, cls: s.hType === t ? 'on' : '', pick: () => set({ hType: t }) }));
+    const hClients = ['All', 'VOVO', 'Thinkware', 'Dogtra', 'Ecosense'].map((c) => ({ name: c === 'All' ? 'All clients' : c, cls: s.hClient === c ? 'on' : '', pick: () => set({ hClient: c }) }));
+    const scanChips = [['all', 'All', false], ['bad', '확인 필요만', true]].map((c) => ({ name: c[1], cls: s.scanBad === c[2] ? 'on' : '', pick: () => set({ scanBad: c[2] }) }));
+
+    // ---- Parcel
+    const pAll = [
+      { date: '10/24', carrier: 'UPS', tracking: '1Z84W1830312345678', customer: 'Lion Country Supply', po: 'DGB-24790', type: '3PL', charge: 42.0, cost: 31.2, status: '정산완료', team: '3PL' },
+      { date: '10/23', carrier: 'CP', tracking: '7023210038812345', customer: 'J. Kim', po: '#SS-55120', type: '3PL', charge: 18.4, cost: 13.95, status: '정산완료', team: '3PL' },
+      { date: '10/23', carrier: 'UPS', tracking: '1Z84W1830398765432', customer: 'Home Hardware', po: 'EC-3381', type: '3PL', charge: 64.1, cost: 0, status: '정산대기', team: '3PL' },
+      { date: '10/14', carrier: 'UPS', tracking: '1Z84W1830355500021', customer: '[Forwarding client]', po: 'x', type: 'Courier', charge: 88.0, cost: 0, status: '누락', team: '택배' },
+      { date: '10/22', carrier: 'CP', tracking: '7023210038890001', customer: 'Individual', po: 'VO-10-109', type: '3PL', charge: 22.75, cost: 0, status: '정산대기', team: '3PL' },
+      { date: '10/09', carrier: 'CP', tracking: '7023210038700777', customer: 'Gun Dog Supply', po: 'DGB-24502', type: '3PL', charge: 19.6, cost: 0, status: '누락', team: '3PL' },
+      { date: '10/20', carrier: 'UPS', tracking: '1Z84W1830377712345', customer: '[Forwarding client]', po: 'x', type: 'Courier', charge: 120.0, cost: 96.4, status: '정산완료', team: '택배' }
+    ];
+    const pCls = { '정산완료': 'g', '누락': 'r', '정산대기': 'n' };
+    const pRows = pAll.filter((r) => s.pStatus === 'All' || r.status === s.pStatus).map((r) => ({
+      date: r.date, carrier: r.carrier, tracking: r.tracking, customer: r.customer, po: r.po, type: r.type, team: r.team, status: r.status, cls: pCls[r.status],
+      charge: money(r.charge), cost: r.cost ? money(r.cost) : '-', margin: r.cost ? money(r.charge - r.cost) : '-', mCls: r.cost && r.charge - r.cost < 0 ? 'neg' : ''
+    }));
+    const pc = { done: pAll.filter((r) => r.status === '정산완료').length, miss: pAll.filter((r) => r.status === '누락').length, wait: pAll.filter((r) => r.status === '정산대기').length };
+    const pChips = ['All', '정산완료', '누락', '정산대기'].map((c) => ({ name: c, cls: s.pStatus === c ? 'on' : '', pick: () => set({ pStatus: c }) }));
+    const adj = [
+      { tracking: '1Z84W1830312345678', cat: 'Weight / dim correction', customer: 'Lion Country Supply', amt: '$12.40', rebill: 'Rebill', cls: 'o' },
+      { tracking: '1Z84W1830377712345', cat: 'Address correction', customer: '[Forwarding client]', amt: '$21.00', rebill: 'Rebill', cls: 'o' },
+      { tracking: '1Z84W1830398765432', cat: 'Additional handling', customer: 'Home Hardware', amt: '$18.50', rebill: 'Absorb', cls: 'n' }
+    ];
+
+    // ---- Rates
+    const rateDefs = {
+      VOVO: [
+        ['ship', 'Shipping fee', null, '실비', '출고 · 리라벨 Fee 합계', 'Auto'],
+        ['op', 'Order processing fee', 5, '', '출고 PO 수 (중복 제외)', 'Auto'],
+        ['pp_tcb', 'Pick & Pack (TCB)', 5, '', 'TCB 품목, PO당 9개 이하', 'Auto'],
+        ['bpp_tcb', '대량 Pick & Pack (TCB)', 3, '', 'TCB 품목, PO당 10개 이상', 'Auto'],
+        ['pp_x', 'Pick & Pack (TCB 외)', 3, '', '외 · TCB 상부, PO당 9개 이하', 'Auto'],
+        ['bpp_x', '대량 Pick & Pack (TCB 외)', 1, '', '외 · TCB 상부, PO당 10개 이상', 'Auto'],
+        ['upper', 'TCB UPPER packing fee', 15, '', 'TCB 상부 출고 수량', 'Auto'],
+        ['storage', 'Storage', 12, '', '주별 팔레트 수', 'Auto'],
+        ['inbound', 'Inbound', 15, '', '입고 팔레트 수', 'Manual'],
+        ['palA', 'Pallet Fee A', 30, '', '출고 팔레트 수', 'Manual'],
+        ['retItem', 'Return Item', 3, '', '반품 입고 수량', 'Manual']
+      ],
+      Thinkware: [
+        ['op', 'Order processing fee', 5, '', '출고 PO 수 (중복 제외)', 'Auto'],
+        ['pp', 'Pick & Pack', 0.5, '', '출고 수량 (A · B · NI 포함)', 'Auto'],
+        ['storage', 'Storage (Stackable)', 15, '', '주별 팔레트 수', 'Auto'],
+        ['palIn', 'Pallet Inbound', 60, '', '입고 팔레트 수 (50 + 10)', 'Manual'],
+        ['boxIn', 'Box Inbound', 2, '', '입고 박스 수', 'Manual'],
+        ['indiv', 'Individual item fee', 1, '', '재포장 · 라벨 수량', 'Manual']
+      ],
+      Dogtra: [
+        ['ship', 'Shipping fee', null, '실비', '출고 · 리라벨 Fee 합계', 'Auto'],
+        ['op', 'Order processing fee', 5, '', '출고 + 반품 PO 수', 'Auto'],
+        ['pp', 'Pick & Pack', null, '계단식', 'PO별 N: <200 → 3 + 2(N−1), ≥200 → 3 + 1(N−1)', 'Auto'],
+        ['ret', 'Return handling', 2, '', '반품 운송장 수', 'Auto'],
+        ['storage', 'Storage', 20, '', '주별 팔레트 수', 'Auto'],
+        ['inbound', 'Inbound', 2, '', '입고 박스 수', 'Manual']
+      ],
+      Ecosense: [
+        ['pp', 'Pick & Pack (제품 종류)', 5, '', '출고 행 수 (오더별 SKU)', 'Auto'],
+        ['indiv', 'Individual item fee (마스터 카톤)', 10, '', '행별 수량 ÷ 카톤 입수, 몫', 'Auto'],
+        ['mat', 'Materials (사용 박스)', 3, '', '나머지 있으면 1박스', 'Auto'],
+        ['label', 'Labelling', 0.5, '', '라벨 수량', 'Manual']
+      ]
+    };
+    const rateOf = (c, k) => { const d = rateDefs[c].find((r) => r[0] === k); const ov = s.rateOv[c + '|' + k]; return ov !== undefined ? num(ov) : (d ? d[2] : 0); };
+    const rateChips = Object.keys(rateDefs).map((c) => ({ name: c, cls: s.rateClient === c ? 'on' : '', pick: () => set({ rateClient: c }) }));
+    const rateRows = rateDefs[s.rateClient].map((r) => {
+      const key = s.rateClient + '|' + r[0];
+      const v = s.rateOv[key] !== undefined ? s.rateOv[key] : String(r[2]);
+      return { item: r[1], shown: r[2] === null ? r[3] : money(r[2]), num: r[2] !== null, txt: r[2] === null, label: r[3], v: v, basis: r[4], mode: r[5], cls: r[5] === 'Auto' ? 'b' : 'n',
+        set: (e) => { const o = Object.assign({}, s.rateOv); o[key] = e.target.value; set({ rateOv: o }); } };
+    });
+
+    // ---- Invoice
+    const monthQty = {
+      VOVO: [['ship', 0, 2105.4, '출고 64건 Fee'], ['op', 64], ['pp_tcb', 58], ['bpp_tcb', 120], ['pp_x', 40], ['bpp_x', 200], ['upper', 12], ['inbound', 4, null, '', true], ['palA', 3, null, '', true]],
+      Thinkware: [['op', 85], ['pp', 1460], ['palIn', 6, null, '', true], ['indiv', 300, null, '', true]],
+      Dogtra: [['ship', 0, 1284.6, '출고 · 리라벨 46건'], ['op', 42], ['pp', 42, 412, 'PO 42건 계단식 합계'], ['ret', 6], ['inbound', 40, null, '', true]],
+      Ecosense: [['pp', 52], ['indiv', 31], ['mat', 18], ['label', 200, null, '', true]]
+    };
+    const statusCls = { None: 'n', Draft: 'n', Review: 'o', Confirmed: 'g' };
+    const statusL = { None: 'Not created', Draft: 'Draft', Review: 'Review', Confirmed: 'Confirmed' };
+    const buildLines = (c) => {
+      const st = s.inv[c];
+      const canEdit = false;
+      const lines = [];
+      monthQty[c].forEach((m) => {
+        const d = rateDefs[c].find((r) => r[0] === m[0]);
+        const manual = !!m[4];
+        const key = c + '|' + m[0];
+        const qty = s.qtyOv[key] !== undefined ? s.qtyOv[key] : String(m[1]);
+        const fixed = m[2] !== undefined && m[2] !== null;
+        const amount = fixed ? m[2] : num(qty) * rateOf(c, m[0]);
+        lines.push({ item: d[1], remark: '', basis: m[3] || d[4], qty: fixed && m[0] === 'ship' ? '-' : qty, rateL: d[2] === null ? d[3] : money(rateOf(c, m[0])), amount: amount, src: manual ? 'Manual' : 'Auto', cls: manual ? 'n' : 'b',
+          editQty: manual && canEdit, showQty: !(manual && canEdit), editAmt: false, showAmt: true, amtIn: '',
+          onQty: (e) => { const o = Object.assign({}, s.qtyOv); o[key] = e.target.value; set({ qtyOv: o }); }, onAmt: null });
+      });
+      const sr = rateDefs[c].find((r) => r[0] === 'storage');
+      if (sr) s.pal[c].forEach((p, w) => {
+        lines.push({ item: sr[1], remark: ' · WEEK ' + (w + 1), basis: '팔레트 ' + p, qty: String(p), rateL: money(rateOf(c, 'storage')), amount: num(p) * rateOf(c, 'storage'), src: 'Auto', cls: 'b', editQty: false, showQty: true, editAmt: false, showAmt: true, amtIn: '', onQty: null, onAmt: null });
+      });
+      (s.extra[c] || []).forEach((x, idx) => {
+        lines.push({ item: 'Extra Charge', remark: '', basis: '수동 입력', qty: '1', rateL: '실비', amount: num(x), src: 'Manual', cls: 'n', editQty: false, showQty: true, editAmt: canEdit, showAmt: !canEdit, amtIn: x,
+          onQty: null, onAmt: (e) => { const ex = Object.assign({}, s.extra); ex[c] = ex[c].slice(); ex[c][idx] = e.target.value; set({ extra: ex }); } });
+      });
+      lines.forEach((l) => { l.amt = money(l.amount); });
+      return lines;
+    };
+    const billClients = ['VOVO', 'Thinkware', 'Dogtra', 'Ecosense'];
+    const billList = billClients.map((c) => {
+      const st = s.inv[c];
+      const total = st === 'None' ? '-' : money(buildLines(c).reduce((t, l) => t + l.amount, 0));
+      return { client: c, status: statusL[st], cls: statusCls[st], total: total, chipCls: s.billClient === c ? 'on' : '', open: () => set({ sec: 'bill', billClient: c }) };
+    });
+    const bc = s.billClient;
+    const bst = s.inv[bc];
+    const setInv = (v) => { const o = Object.assign({}, s.inv); o[bc] = v; set({ inv: o }); };
+    const order = ['Draft', 'Review', 'Confirmed'];
+    const idx = order.indexOf(bst);
+    const steps = [['1', '가져오기'], ['2', '검토'], ['3', '확정']].map((x, i) => ({ n: x[0], label: x[1], cls: i < idx || bst === 'Confirmed' ? 'done' : i === idx ? 'on' : '' }));
+    let actions = [];
+    if (bst === 'None') actions = [{ label: 'Import from Excel', cls: 'pri', run: () => setInv('Draft') }];
+    if (bst === 'Draft') actions = [{ label: 'Re-import', cls: '', run: () => setInv('Draft') }, { label: 'Send to review', cls: 'pri', run: () => setInv('Review') }];
+    if (bst === 'Review') actions = [{ label: 'Back to draft', cls: '', run: () => setInv('Draft') }, { label: 'Confirm & issue', cls: 'pri', run: () => setInv('Confirmed') }];
+    if (bst === 'Confirmed') actions = [{ label: 'Download PDF', cls: '', run: () => null }, { label: 'Reopen', cls: '', run: () => setInv('Review') }];
+    const blines = bst === 'None' ? [] : buildLines(bc);
+    const bill = {
+      no: bc.toUpperCase() + ' 2610', steps: steps,
+      arNote: bst === 'Confirmed' ? 'AR posted · 사내 BMS HBL ' + bc.toUpperCase() + ' 2610' : 'Confirm & issue → 사내 BMS에 AR 자동 등록', arCls: bst === 'Confirmed' ? 'g' : 'n', actions: actions, empty: bst === 'None', hasLines: bst !== 'None', lines: blines,
+      total: money(blines.reduce((t, l) => t + l.amount, 0)), canEdit: false,
+      addLine: () => { const ex = Object.assign({}, s.extra); ex[bc] = (ex[bc] || []).concat(['0']); set({ extra: ex }); }
+    };
+    const pallets = billClients.map((c) => ({ client: c, weeks: s.pal[c].map((v, w) => ({ v: String(v), label: c + ' week ' + (w + 1),
+      set: (e) => { const p = Object.assign({}, s.pal); p[c] = p[c].slice(); p[c][w] = e.target.value; set({ pal: p }); } })) }));
+
+    // ---- Master
+    const clientsM = [
+      ['Thinkware', 'TH', 'Y', 'ShipStation, Email (FBA)'], ['VOVO', 'VO', '-', 'Email PDF'], ['Dogtra', 'DO', 'Y', 'Shopify, Email (B2B)'], ['Ecosense', 'EC', '-', 'ShipStation, Email (FBA)'],
+      ['3D', '3D', 'Y', 'Email PDF'], ['Pages', 'PA', 'Y', 'Email PDF'], ['Fika', 'FI', '-', 'Email PDF'], ['Halo21', 'HA', '-', 'Email PDF'], ['Rehan', 'RE', '-', 'Email PDF'],
+      ['WellnezB', 'WE', '-', 'Email PDF'], ['DR.G', '[미부여]', '-', 'Email PDF'], ['Forman', '[미부여]', '-', 'Email PDF']
+    ].map((c) => ({ name: c[0], prefix: c[1], upc: c[2], channel: c[3], managed: c[0] === 'Forman' ? 'Not managed' : 'Managed' }));
+    const itemsM = items.concat([{ client: 'Non_3D', code: '-', name: '[3D bulk storage item]', upc: '-', alias: '-', pack: '-' }]).map((i) => {
+      const managed = i.client.indexOf('Non_') !== 0;
+      return { client: i.client, name: i.name, upc: i.upc, alias: i.alias, code: i.code, pack: i.client === 'VOVO' ? i.pack : '-',
+        managedL: managed ? 'Yes' : 'No (Non_)', mCls: managed ? 'g' : 'n' };
+    });
+    const roles = [
+      { role: 'Coship (internal)', users: '사내 계정', access: 'BMS 전체 메뉴 (부서별 구분 없음)' },
+      { role: 'Client (portal)', users: '화주사 계정', access: '자기 회사 데이터만, 조회 · 다운로드' }
+    ];
+    const mTabs = [['clients', 'Clients'], ['items', 'Items'], ['rates', 'Rates'], ['users', 'Users']].map((t) => ({ label: t[1], cls: s.mt === t[0] ? 'on' : '', go: () => set({ mt: t[0] }) }));
+
+    const navDefs = [['dash', 'Dashboard'], ['inv', 'Inventory'], ['io', 'Inbound / Outbound'], ['hist', 'History'], ['scan', 'Scan & Serial'], ['ret', 'Returns'], ['parcel', 'Parcel Billing'], ['bill', 'Monthly Invoice'], ['master', 'Master Data']];
+    const is = {}; navDefs.forEach((d) => { is[d[0]] = s.sec === d[0]; });
+
+    return {
+      navs: navDefs.map((d) => ({ label: d[1], cls: s.sec === d[0] ? 'on' : '', go: () => set({ sec: d[0] }) })),
+      is: is,
+      showSync: s.showSync, toggleSync: () => set({ showSync: !s.showSync }),
+      syncLog: [
+        { time: '10:42', file: '종합재고관리.xlsx', add: 14, chg: 3, res: 'OK', cls: 'g' },
+        { time: '10:40', file: '현장작업_개선_v3.xlsb', add: 61, chg: 22, res: 'OK', cls: 'g' },
+        { time: '10:38', file: 'UPS_CP_정산.xlsx', add: 9, chg: 0, res: 'OK', cls: 'g' },
+        { time: '09:12', file: '종합재고관리.xlsx', add: 0, chg: 0, res: 'Skipped · 파일 사용 중', cls: 'o' },
+        { time: '08:30', file: '현장작업_개선_v3.xlsb', add: 0, chg: 1, res: 'Warning · ItemCode 없는 행 1', cls: 'o' }
+      ],
+      pendingCount: pendingCount, floor: floor, floorDone: fsum('done'), floorWait: fsum('wait'), floorCheck: fsum('check'),
+      negCount: negItems.length, parcelMissing: pc.miss,
+      billDone: billClients.filter((c) => s.inv[c] === 'Confirmed').length, billTotal: billClients.length, billList: billList,
+      goIO: () => set({ sec: 'io', io: 'out' }), goScan: () => set({ sec: 'scan', scanBad: true }), goInvNeg: () => set({ sec: 'inv', neg: true, invClient: 'All' }), goParcel: () => set({ sec: 'parcel', pStatus: '누락' }), goBill: () => set({ sec: 'bill' }),
+      invScope: s.invClient === 'All' ? 'All clients' : s.invClient, totA: n0(sum(scoped, 'a')), totB: n0(sum(scoped, 'b')),
+      negSel: s.neg ? 'sel' : '', toggleNeg: () => set({ neg: !s.neg }), invChips: invChips,
+      invQ: s.invQ, onInvQ: (e) => set({ invQ: e.target.value }), invRows: invRows, invCount: invRows.length, hasItem: !!sel, noItem: !sel, it: it,
+      ioTabs: ioTabs, ioChips: ioChips, io: { out: s.io === 'out', in: s.io === 'in', re: s.io === 're' },
+      outRows: outRows,
+      inRows: inAll.filter((r) => ioOk(r, r.date, r.po + ' ' + r.item + ' ' + r.upc)),
+      reRows: reAll.filter((r) => ioOk(r, r.date, r.po + ' ' + r.item)),
+      ioFrom: s.ioFrom, ioTo: s.ioTo, ioQ: s.ioQ,
+      onIoFrom: (e) => set({ ioFrom: e.target.value }), onIoTo: (e) => set({ ioTo: e.target.value }), onIoQ: (e) => set({ ioQ: e.target.value }),
+      hFrom: s.hFrom, hTo: s.hTo, hQ: s.hQ,
+      onHFrom: (e) => set({ hFrom: e.target.value }), onHTo: (e) => set({ hTo: e.target.value }), onHQ: (e) => set({ hQ: e.target.value }),
+      hTypes: hTypes, hClients: hClients, hRows: hRows,
+      scanQ: s.scanQ, onScanQ: (e) => set({ scanQ: e.target.value }), scanRows: scanRows, scanChips: scanChips,
+      sFrom: s.sFrom, sTo: s.sTo, onSFrom: (e) => set({ sFrom: e.target.value }), onSTo: (e) => set({ sTo: e.target.value }),
+      sViews: sViews, sv: { rows: s.sView === 'rows', items: s.sView === 'items' }, sItems: sItems,
+      rFrom: s.rFrom, rTo: s.rTo, rItem: s.rItem, rSerial: s.rSerial, rChips: rChips, rRows: rRows,
+      onRFrom: (e) => set({ rFrom: e.target.value }), onRTo: (e) => set({ rTo: e.target.value }),
+      onRItem: (e) => set({ rItem: e.target.value }), onRSerial: (e) => set({ rSerial: e.target.value }),
+      pc: pc, pChips: pChips, pRows: pRows, adj: adj,
+      bill: bill, pallets: pallets,
+      mTabs: mTabs, m: { clients: s.mt === 'clients', items: s.mt === 'items', rates: s.mt === 'rates', users: s.mt === 'users' },
+      clientsM: clientsM, itemsM: itemsM, rateChips: rateChips, rateRows: rateRows, roles: roles
+    };
+  }
+}
+</script>
+</body>
+</html>
+
